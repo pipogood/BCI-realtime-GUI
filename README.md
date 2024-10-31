@@ -4,7 +4,7 @@ This project aims to create an EEG GUI for a real-time graph and to be the BCI a
 
 **If you want to use it, Please follow Instruction.pdf**   
 
-![Project Screenshot](./Screenshot 2024-10-31 210048.png)
+![Project Screenshot](Screenshot 2024-10-31 210048.png)
 
 # Authors
 1. Sirapakit Limtragooltongchai (sirapakit.lim@gmail.com)

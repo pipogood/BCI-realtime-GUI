@@ -1,10 +1,18 @@
 # Real-time EEG Monitoring with Python
 
-This project aims to create an EEG GUI for a real-time graph and to be the BCI approach for sending the predicted SSVEP command to Unity.
+This project aims to create an EEG GUI for real-time plotting and to be the BCI approach for sending the predicted SSVEP command to Unity.
+This GUI can stream EEG data via LSL from an EEG device.
 
 **If you want to use it, Please follow Instruction.pdf**   
 
-![Project Screenshot](Screenshot 2024-10-31 210048.png)
+**Note**
+These codes were tested with Python 3.11.0
+
+Require library:
+```
+pip install numpy scipy pylsl pickle-mixin matplotlib scikit-learn dearpygui
+```
+![Project Screenshot](Screenshot.png)
 
 # Authors
 1. Sirapakit Limtragooltongchai (sirapakit.lim@gmail.com)

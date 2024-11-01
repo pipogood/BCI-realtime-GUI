@@ -10,7 +10,7 @@ These codes were tested with Python 3.11.0
 
 Require library:
 ```
-pip install numpy scipy pylsl pickle-mixin matplotlib scikit-learn dearpygui
+pip install numpy scipy pylsl pickle-mixin matplotlib scikit-learn dearpygui mne-realtime
 ```
 ![Project Screenshot](Screenshot.png)
 

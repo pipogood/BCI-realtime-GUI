@@ -5,6 +5,12 @@ This GUI can stream EEG data via LSL from an EEG device.
 
 **If you want to use it, Please follow Instruction.pdf**   
 
+**Note**
+These codes was tested with Python 3.11.0
+Require library:
+```
+pip install numpy scipy pylsl pickle-mixin matplotlib scikit-learn dearpygui
+```
 ![Project Screenshot](Screenshot.png)
 
 # Authors

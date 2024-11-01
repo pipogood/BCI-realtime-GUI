@@ -29,6 +29,7 @@ class EEGModel:
         self.command_queue = command_queue
         self.samp_freq = samp_freq
         self.command = ""
+        self.EEG_epoch = np.zeros((num_channels, samp_freq))
         nyq = 0.5 * samp_freq
         self.b, self.a = signal.butter(4,[band_pass[0]/nyq,band_pass[1]/nyq],'bandpass')
 
@@ -57,12 +58,20 @@ class EEGModel:
                     if self.status_queue:
                         self.status_queue.put((True, self.stream_name))
                     while self.running:
-                        samples, _ = inlet.pull_chunk(max_samples = self.samp_freq)
-                        if samples:
-                            data = np.array(samples).T  # Transpose for correct shape
-                            if data.shape[0] == self.num_channels and data.shape[1] == self.samp_freq:
+                        # samples, _ = inlet.pull_chunk(max_samples = self.samp_freq)
+                        # if samples:
+                        #     data = np.array(samples).T  # Transpose for correct shape
+                        #     if data.shape[0] == self.num_channels and data.shape[1] == self.samp_freq:
+                        #         if not self.queue1.full():
+                        #             self.queue1.put(data*10e3)  # Add data if queue1 has space
+                        sample, _ = inlet.pull_sample()
+                        if sample:
+                            data = np.array(sample).T
+                            if data.shape[0] == self.num_channels:
+                                self.EEG_epoch = np.roll(self.EEG_epoch, -1, axis=1)
+                                self.EEG_epoch[:, -1] = data
                                 if not self.queue1.full():
-                                    self.queue1.put(data*10e3)  # Add data if queue1 has space
+                                    self.queue1.put(self.EEG_epoch*10e3)  # Add data if queue1 has space
                         sys.stdout.flush()
 
     def rolling_samples(self):

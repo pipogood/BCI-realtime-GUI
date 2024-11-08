@@ -6,7 +6,7 @@ This GUI can stream EEG data via LSL from an EEG device.
 **If you want to use it, Please follow Instruction.pdf**   
 
 **Note**
-These codes were tested with Python 3.11.0
+These codes were tested with Python 3.11.0, Window 11
 
 Require library:
 ```

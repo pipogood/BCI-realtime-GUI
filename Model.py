@@ -64,12 +64,12 @@ class EEGModel:
                         #     if data.shape[0] == self.num_channels and data.shape[1] == self.samp_freq:
                         #         if not self.queue1.full():
                         #             self.queue1.put(data*10e3)  # Add data if queue1 has space
-                        sample, _ = inlet.pull_sample()
+                        sample, _ = inlet.pull_chunk()
                         if sample:
                             data = np.array(sample).T
                             if data.shape[0] == self.num_channels:
-                                self.EEG_epoch = np.roll(self.EEG_epoch, -1, axis=1)
-                                self.EEG_epoch[:, -1] = data
+                                self.EEG_epoch = np.roll(self.EEG_epoch, -data.shape[1], axis=1)
+                                self.EEG_epoch[:, -data.shape[1]:] = data
                                 if not self.queue1.full():
                                     self.queue1.put(self.EEG_epoch*10e3)  # Add data if queue1 has space
                         sys.stdout.flush()
@@ -118,22 +118,27 @@ class EEGModel:
                     power_spectrum = power_spectrum.reshape(1,power_spectrum.shape[0],power_spectrum.shape[1])
                     fft_test = np.stack([arr.flatten() for arr in power_spectrum])
 
-                    with open("trained_model/SVM_model.pkl", "rb") as file:
+                    with open("trained_model/KNN_model.pkl", "rb") as file:
                         svm_model = pickle.load(file)
 
-                    predict = svm_model.predict(fft_test.reshape(1,fft_test.shape[1]))
+                    try:
+                        predict = svm_model.predict(fft_test.reshape(1,fft_test.shape[1]))
 
-                    if predict[0] == 10:
-                        self.command = '6Hz'
-                    elif predict[0] == 8:
-                        self.command = '12Hz'
-                    elif predict[0] == 4:
-                        self.command = '24Hz'
-                    else:
-                        self.command = '30Hz'
+                        if predict[0] == 10:
+                            self.command = '6Hz'
+                        elif predict[0] == 8:
+                            self.command = '12Hz'
+                        elif predict[0] == 4:
+                            self.command = '24Hz'
+                        else:
+                            self.command = '30Hz'
 
-                    # print("predict_command", self.command)
-                    self.command_queue.put(self.command)
+                        # print("predict_command", self.command)
+                        self.command_queue.put(self.command)
+
+                    except Exception as e:
+                        print(f"Preprocess model error: {e}")
+                    
 
             time.sleep(0.1)  # Reduce FFT frequency to conserve memory and processing
 

@@ -10,12 +10,12 @@ import pickle
 
 ############### Biosemi Channels ################
 # 1. Select all channels
-# with open("datasets/biosemi_chans.pkl", "rb") as file:
-#     ch_names = pickle.load(file)
-#     ch_names = ch_names[0:72]
+with open("datasets/biosemi_chans.pkl", "rb") as file:
+    ch_names = pickle.load(file)
+    # ch_names = ch_names[0:72]
 
 # 2. Select target channels
-ch_names = ['O1','Oz','PO3','PO4','POz','Pz']
+# ch_names = ['O1','Oz','PO3','PO4','POz','Pz']
 
 
 num_channels = len(ch_names)
@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     # Initialize the Model and View with LSL streaming
     model = EEGModel(num_channels=num_channels, samp_freq = samp_freq, window_size_second = window_size_second, band_pass = (2,40),
-                     stream_name="SomSom",status_queue=status_queue, command_queue=command_queue)
+                     stream_name="BioSemi",status_queue=status_queue, command_queue=command_queue)
     
     view = RealTimeView(model, ch_names, samp_freq=samp_freq, window_size_second=window_size_second)
 

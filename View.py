@@ -42,7 +42,7 @@ class RealTimeView:
         with dpg.window(label="EEG Streaming", tag="streaming_window", height=700, width=700):
             self.plot_lines = []
             for i in range(4):  # Display only 4 selected channels
-                with dpg.plot(height=80, width=600, no_menus=True):
+                with dpg.plot(height=100, width=600, no_menus=True):
                     x_axis = dpg.add_plot_axis(dpg.mvXAxis, no_tick_labels=True)
                     y_axis = dpg.add_plot_axis(dpg.mvYAxis, label=f"Chn {i+1}", no_tick_labels=True)
                     plot_line = dpg.add_line_series(list(range(self.window_size)), self.plot_array[i], parent=y_axis)

@@ -71,7 +71,7 @@ class EEGModel:
                                 self.EEG_epoch = np.roll(self.EEG_epoch, -data.shape[1], axis=1)
                                 self.EEG_epoch[:, -data.shape[1]:] = data
                                 if not self.queue1.full():
-                                    self.queue1.put(self.EEG_epoch*10e3)  # Add data if queue1 has space
+                                    self.queue1.put(self.EEG_epoch)  # Add data if queue1 has space
                         sys.stdout.flush()
 
     def rolling_samples(self):
@@ -97,9 +97,9 @@ class EEGModel:
                 data = self.queue3.get()
                 filtered_data = filtfilt(self.b, self.a, data)
                 if not self.queue4.full():
-                    self.queue4.put(filtered_data * 10e6)
+                    self.queue4.put(filtered_data)
             sys.stdout.flush()
-            time.sleep(0.1)
+            time.sleep(0.05)
 
     def preprocess_model(self):
         """Compute FFT on filtered data at a limited frequency to manage memory usage."""
@@ -118,29 +118,40 @@ class EEGModel:
                     power_spectrum = power_spectrum.reshape(1,power_spectrum.shape[0],power_spectrum.shape[1])
                     fft_test = np.stack([arr.flatten() for arr in power_spectrum])
 
-                    with open("trained_model/KNN_model.pkl", "rb") as file:
+                    with open("trained_model/Scaler.pkl", "rb") as file:
+                        scaler = pickle.load(file)
+
+                    fft_test = scaler.transform(fft_test)
+
+                    with open("trained_model/LDA_model.pkl", "rb") as file:
                         svm_model = pickle.load(file)
 
                     try:
                         predict = svm_model.predict(fft_test.reshape(1,fft_test.shape[1]))
+                        predict_prob = svm_model.predict_proba(fft_test.reshape(1,fft_test.shape[1]))
 
-                        if predict[0] == 10:
-                            self.command = '6Hz'
-                        elif predict[0] == 8:
-                            self.command = '12Hz'
-                        elif predict[0] == 4:
-                            self.command = '24Hz'
+                        arg_max = np.argmax(predict_prob[0])
+                        # print(arg_max, predict_prob[0][arg_max])
+
+                        if predict_prob[0][arg_max] > 0.6:
+                            if predict[0] == 10:
+                                self.command = '6Hz'
+                            elif predict[0] == 8:
+                                self.command = '12Hz'
+                            elif predict[0] == 4:
+                                self.command = '24Hz'
+                            else:
+                                self.command = '30Hz'
                         else:
-                            self.command = '30Hz'
+                            self.command = 'Non'
 
-                        # print("predict_command", self.command)
                         self.command_queue.put(self.command)
 
                     except Exception as e:
                         print(f"Preprocess model error: {e}")
                     
 
-            time.sleep(0.1)  # Reduce FFT frequency to conserve memory and processing
+            time.sleep(0.05)  # Reduce FFT frequency to conserve memory and processing
 
 
     def send_to_unity(self):

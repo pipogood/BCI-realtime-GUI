@@ -58,18 +58,12 @@ class EEGModel:
                     if self.status_queue:
                         self.status_queue.put((True, self.stream_name))
                     while self.running:
-                        # samples, _ = inlet.pull_chunk(max_samples = self.samp_freq)
-                        # if samples:
-                        #     data = np.array(samples).T  # Transpose for correct shape
-                        #     if data.shape[0] == self.num_channels and data.shape[1] == self.samp_freq:
-                        #         if not self.queue1.full():
-                        #             self.queue1.put(data*10e3)  # Add data if queue1 has space
                         sample, _ = inlet.pull_chunk()
                         if sample:
                             data = np.array(sample).T
                             if data.shape[0] == self.num_channels:
                                 self.EEG_epoch = np.roll(self.EEG_epoch, -data.shape[1], axis=1)
-                                self.EEG_epoch[:, -data.shape[1]:] = data
+                                self.EEG_epoch[:, -data.shape[1]:] = data * 10e3
                                 if not self.queue1.full():
                                     self.queue1.put(self.EEG_epoch)  # Add data if queue1 has space
                         sys.stdout.flush()
@@ -118,10 +112,9 @@ class EEGModel:
                     power_spectrum = power_spectrum.reshape(1,power_spectrum.shape[0],power_spectrum.shape[1])
                     fft_test = np.stack([arr.flatten() for arr in power_spectrum])
 
-                    with open("trained_model/Scaler.pkl", "rb") as file:
-                        scaler = pickle.load(file)
-
-                    fft_test = scaler.transform(fft_test)
+                    # with open("trained_model/Scaler.pkl", "rb") as file:
+                    #     scaler = pickle.load(file)
+                    # fft_test = scaler.transform(fft_test)
 
                     with open("trained_model/LDA_model.pkl", "rb") as file:
                         svm_model = pickle.load(file)
@@ -144,6 +137,7 @@ class EEGModel:
                                 self.command = '30Hz'
                         else:
                             self.command = 'Non'
+                            
 
                         self.command_queue.put(self.command)
 

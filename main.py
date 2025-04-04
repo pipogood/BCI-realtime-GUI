@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     # Initialize the Model and View with LSL streaming
     model = EEGModel(num_channels=num_channels, samp_freq = samp_freq, window_size_second = window_size_second, band_pass = (2,40),
-                     stream_name="BioSemi",status_queue=status_queue, command_queue=command_queue)
+                     stream_name="SomSom",status_queue=status_queue, command_queue=command_queue)
     
     view = RealTimeView(model, ch_names, samp_freq=samp_freq, window_size_second=window_size_second)
 

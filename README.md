@@ -18,7 +18,7 @@ git clone https://github.com/pipogood/BCI-Class-Material.git
 pip install -r requirements.txt
 ```
 
-**For GUI Algorithm detail, please follow Instruction.pdf**   
+**For GUI Algorithm detail, please read refer to Instruction.pdf**   
 
 ![Project Screenshot](Screenshot.png)
 

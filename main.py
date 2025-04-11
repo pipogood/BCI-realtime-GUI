@@ -5,17 +5,13 @@ import multiprocessing as mp
 import time
 import pickle
 
-############### Unicorn Channels ################
-# ch_names = ['Fz','C3','Cz','C4','Pz','PO7', 'Oz', 'PO8', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-
 ############### Biosemi Channels ################
 # 1. Select all channels
-with open("datasets/biosemi_chans.pkl", "rb") as file:
-    ch_names = pickle.load(file)
-    # ch_names = ch_names[0:72]
+# with open("datasets/biosemi_chans.pkl", "rb") as file:
+#     ch_names = pickle.load(file)
 
 # 2. Select target channels
-# ch_names = ['O1','Oz','PO3','PO4','POz','Pz']
+ch_names = ['O1','Oz','PO3','POz','Pz']
 
 
 num_channels = len(ch_names)

@@ -22,13 +22,13 @@ class EEGModel:
         self.stream_name = stream_name  # Name of the LSL stream to connect to
         self.status_queue = status_queue  # Queue for updating connection status
         self.queue1 = Queue(maxsize=10000)  # For storing LSL data, limited to prevent overflow
-        self.queue3 = Queue(maxsize=10000)  # For storing rolled EEG data
-        self.queue4 = Queue(maxsize=10000)  # For storing filtered EEG
-        self.queue5 = Queue(maxsize=10000)  # For storing FFT data
+        self.queue2 = Queue(maxsize=10000)  # For storing rolled EEG data
+        self.queue3 = Queue(maxsize=10000)  # For storing filtered EEG
+        self.queue4 = Queue(maxsize=10000)  # For storing FFT data
         self.running = False
         self.command_queue = command_queue
         self.samp_freq = samp_freq
-        self.command = ""
+        self.command = "Non"
         self.EEG_epoch = np.zeros((num_channels, samp_freq))
         nyq = 0.5 * samp_freq
         self.b, self.a = signal.butter(4,[band_pass[0]/nyq,band_pass[1]/nyq],'bandpass')
@@ -66,7 +66,8 @@ class EEGModel:
                                 self.EEG_epoch[:, -data.shape[1]:] = data * 10e3
                                 if not self.queue1.full():
                                     self.queue1.put(self.EEG_epoch)  # Add data if queue1 has space
-                        sys.stdout.flush()
+
+                        time.sleep(0.05)
 
     def rolling_samples(self):
         """Continuously roll and update the main EEG data buffer."""
@@ -78,43 +79,39 @@ class EEGModel:
                     # Roll and replace data within fixed memory
                     self.main_channel_roll = np.roll(self.main_channel_roll, -shift, axis=1)
                     self.main_channel_roll[:, -shift:] = data
-                    if not self.queue3.full():
-                        self.queue3.put(self.main_channel_roll)
+                    if not self.queue2.full():
+                        self.queue2.put(self.main_channel_roll)
                 except Exception as e:
                     print(f"Rolling samples error: {e}")
 
-            time.sleep(0.1)
+            time.sleep(0.05)
 
     def filtering_windowed_data(self):
         while self.running:
-            if not self.queue3.empty():
-                data = self.queue3.get()
+            if not self.queue2.empty():
+                data = self.queue2.get()
                 filtered_data = filtfilt(self.b, self.a, data)
-                if not self.queue4.full():
-                    self.queue4.put(filtered_data)
-            sys.stdout.flush()
+                if not self.queue3.full():
+                    self.queue3.put(filtered_data)
+
             time.sleep(0.05)
 
     def preprocess_model(self):
         """Compute FFT on filtered data at a limited frequency to manage memory usage."""
         while self.running:
-            if not self.queue4.empty():
-                filtered_data = self.queue4.get()
+            if not self.queue3.empty():
+                filtered_data = self.queue3.get()
                 if filtered_data.shape[1] >= self.window_size:
                     yf = fft(filtered_data) 
                     power_spectrum = np.abs(yf) ** 2
                     xf = fftfreq(self.window_size, 1 / self.samp_freq)[:self.window_size // 2]
-                    if not self.queue5.full():
-                        self.queue5.put(power_spectrum[:])  # Keep only up to 40Hz for efficiency
+                    if not self.queue4.full():
+                        self.queue4.put(power_spectrum[:])  # Keep only up to 40Hz for efficiency
 
                     #####Additional code of your preprocess###########
 
                     power_spectrum = power_spectrum.reshape(1,power_spectrum.shape[0],power_spectrum.shape[1])
                     fft_test = np.stack([arr.flatten() for arr in power_spectrum])
-
-                    # with open("trained_model/Scaler.pkl", "rb") as file:
-                    #     scaler = pickle.load(file)
-                    # fft_test = scaler.transform(fft_test)
 
                     with open("trained_model/LDA_model.pkl", "rb") as file:
                         svm_model = pickle.load(file)
@@ -138,7 +135,6 @@ class EEGModel:
                         else:
                             self.command = 'Non'
                             
-
                         self.command_queue.put(self.command)
 
                     except Exception as e:
@@ -153,5 +149,5 @@ class EEGModel:
             if not self.command_queue.empty():
                 send = self.command_queue.get()
                 sock.sendto(str.encode(send), serverAddressPort)
-            time.sleep(0.1)
+            time.sleep(0.2)
                 

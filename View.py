@@ -10,7 +10,7 @@ class RealTimeView:
         self.queue1 = self.model.queue1
         self.status_queue = self.model.status_queue  
         self.command_queue = self.model.command_queue
-        self.queue_fft = self.model.queue5  # Change queue5 name to queue_fft
+        self.queue_fft = self.model.queue4  # Change queue5 name to queue_fft
         self.num_channels = len(ch_names)  
         self.ch_names = ch_names  # Store channel names
         self.window_size = samp_freq * window_size_second
@@ -186,7 +186,7 @@ class RealTimeView:
                         y_axis = dpg.get_item_parent(self.fft_lines[plot_idx])
                         dpg.set_axis_limits(y_axis, ymin=ymin - 10, ymax=ymax + 10)
 
-            time.sleep(0.1)
+            time.sleep(0.05)
 
 
     def render_loop(self):

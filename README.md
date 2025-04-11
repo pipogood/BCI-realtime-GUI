@@ -13,12 +13,13 @@ git clone https://github.com/pipogood/BCI-Class-Material.git
 ```
 4. (Optional) To create local environments in VS Code using virtual environments (venv), you can follow these steps: open the Command Palette (Ctrl+Shift+P), search for the Python: Create Environment command, and select it.
 [venv setup tutorial](https://code.visualstudio.com/docs/python/environments)
+
    4.1 Activate .venv in terminal
    ```
    .\.venv\Scripts\activate
    ```
    
-5. Direct to your downloaded file path and install required library:
+6. Direct to your downloaded file path and install required library:
 ```
 pip install -r requirements.txt
 ```

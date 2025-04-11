@@ -23,7 +23,6 @@ if __name__ == '__main__':
 
     # Use multiprocessing queues for status updates
     status_queue = mp.Queue()
-    queue1 = mp.Queue()
     command_queue = mp.Queue()
 
     # Initialize the Model and View with LSL streaming

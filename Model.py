@@ -25,8 +25,9 @@ class EEGModel:
         self.queue2 = Queue(maxsize=10000)  # For storing rolled EEG data
         self.queue3 = Queue(maxsize=10000)  # For storing filtered EEG
         self.queue4 = Queue(maxsize=10000)  # For storing FFT data
-        self.running = False
+        self.queue5 =  Queue(maxsize=10000)
         self.command_queue = command_queue
+        self.running = False
         self.samp_freq = samp_freq
         self.command = "Non"
         self.EEG_epoch = np.zeros((num_channels, samp_freq))
@@ -41,7 +42,7 @@ class EEGModel:
         threading.Thread(target=self.data_from_lsl, daemon=True).start()
         threading.Thread(target=self.rolling_samples, daemon=True).start()
         threading.Thread(target=self.filtering_windowed_data, daemon=True).start()
-        threading.Thread(target=self.preprocess_model, daemon=True).start()
+        threading.Thread(target=self.fft_process, daemon=True).start()
         threading.Thread(target=self.send_to_unity, daemon=True).start()
         
     def stop_streaming(self):
@@ -96,7 +97,7 @@ class EEGModel:
 
             time.sleep(0.05)
 
-    def preprocess_model(self):
+    def fft_process(self):
         """Compute FFT on filtered data at a limited frequency to manage memory usage."""
         while self.running:
             if not self.queue3.empty():
@@ -108,7 +109,7 @@ class EEGModel:
                     if not self.queue4.full():
                         self.queue4.put(power_spectrum[:])  # Keep only up to 40Hz for efficiency
 
-                    #####Additional code of your preprocess###########
+                     #####Additional code of your preprocess###########
 
                     power_spectrum = power_spectrum.reshape(1,power_spectrum.shape[0],power_spectrum.shape[1])
                     fft_test = np.stack([arr.flatten() for arr in power_spectrum])
@@ -139,8 +140,7 @@ class EEGModel:
 
                     except Exception as e:
                         print(f"Preprocess model error: {e}")
-                    
-
+                        
             time.sleep(0.05)  # Reduce FFT frequency to conserve memory and processing
 
 

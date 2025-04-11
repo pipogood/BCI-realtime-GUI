@@ -3,6 +3,8 @@
 This project aims to create an EEG GUI for real-time plotting and to be the BCI approach for sending the predicted SSVEP command to Unity.
 This GUI can stream EEG data via LSL from an EEG device.
 
+![Project Screenshot](Screenshot.png)
+
 Please set up follow instructions below:
 
 1. Download VScode on your PC [VScode](https://code.visualstudio.com/download)
@@ -11,22 +13,27 @@ Please set up follow instructions below:
 ```
 git clone https://github.com/pipogood/BCI-Class-Material.git
 ```
-4. (Optional) To create local environments in VS Code using virtual environments (venv), you can follow these steps: open the Command Palette (Ctrl+Shift+P), search for the Python: Create Environment command, and select it.
+4. Create local environments in VS Code using virtual environments (venv), you can follow these steps: open the Command Palette (Ctrl+Shift+P), search for the Python: Create Environment command, and select it.
 [venv setup tutorial](https://code.visualstudio.com/docs/python/environments)
 
    4.1 Activate .venv in terminal
    ```
    .\.venv\Scripts\activate
    ```
-   
-6. Direct to your downloaded file path and install required library:
+
+   4.2 If you use conda or install manually please install required library
+   ```
+   pip install -r requirements.txt
+   ```
+
+5. Run biosemi_stream.ipynb to simulate EEG data streaming     
+6. Run main.py to start real-time GUI:
 ```
-pip install -r requirements.txt
+python main.py
 ```
 
 **For GUI Algorithm detail, please read refer to Instruction.pdf**   
 
-![Project Screenshot](Screenshot.png)
 
 # Authors
 1. Sirapakit Limtragooltongchai (sirapakit.lim@gmail.com)

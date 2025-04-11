@@ -11,7 +11,7 @@ Please set up follow instructions below:
 2. Download Python V.3.11 [Python V3.11](https://www.python.org/downloads/release/python-3110/)
 3. Download this repository
 ```
-git clone https://github.com/pipogood/BCI-Class-Material.git
+git clone https://github.com/pipogood/BCI-realtime-GUI.git
 ```
 4. Create local environments in VS Code using virtual environments (venv), you can follow these steps: open the Command Palette (Ctrl+Shift+P), search for the Python: Create Environment command, and select it.
 [venv setup tutorial](https://code.visualstudio.com/docs/python/environments)

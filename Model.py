@@ -13,6 +13,9 @@ import socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 serverAddressPort = ("127.0.0.1", 1880)
 
+sock_recv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock_recv.bind(("127.0.0.1", 5056))
+
 class EEGModel:
     def __init__(self, num_channels=8, samp_freq=250, window_size_second=4, band_pass = (2,40),stream_name="SomSom", status_queue=None, command_queue=None):
         self.num_channels = num_channels
@@ -44,6 +47,7 @@ class EEGModel:
         threading.Thread(target=self.filtering_windowed_data, daemon=True).start()
         threading.Thread(target=self.fft_process, daemon=True).start()
         threading.Thread(target=self.send_to_unity, daemon=True).start()
+        threading.Thread(target=self.recv_from_unity, daemon=True).start()
         
     def stop_streaming(self):
         """Stop the LSL data stream."""
@@ -64,7 +68,7 @@ class EEGModel:
                             data = np.array(sample).T
                             if data.shape[0] == self.num_channels:
                                 self.EEG_epoch = np.roll(self.EEG_epoch, -data.shape[1], axis=1)
-                                self.EEG_epoch[:, -data.shape[1]:] = data * 10e3
+                                self.EEG_epoch[:, -data.shape[1]:] = data
                                 if not self.queue1.full():
                                     self.queue1.put(self.EEG_epoch)  # Add data if queue1 has space
 
@@ -124,7 +128,7 @@ class EEGModel:
                         arg_max = np.argmax(predict_prob[0])
                         # print(arg_max, predict_prob[0][arg_max])
 
-                        if predict_prob[0][arg_max] > 0.6:
+                        if predict_prob[0][arg_max] > 0.7:
                             if predict[0] == 10:
                                 self.command = '6Hz'
                             elif predict[0] == 8:
@@ -150,4 +154,15 @@ class EEGModel:
                 send = self.command_queue.get()
                 sock.sendto(str.encode(send), serverAddressPort)
             time.sleep(0.2)
+
+
+    def recv_from_unity(self):
+        while self.running:
+            try:
+                data, addr = sock_recv.recvfrom(1024)  # buffer size
+                message = data.decode('utf-8')
+                print(f"[RECV from Unity] {message}")
+                # You can parse/store/process this as needed
+            except Exception as e:
+                print(f"Receive error: {e}")
                 

@@ -45,6 +45,7 @@ class RealTimeView:
                 with dpg.plot(height=100, width=600, no_menus=True):
                     x_axis = dpg.add_plot_axis(dpg.mvXAxis, no_tick_labels=True)
                     y_axis = dpg.add_plot_axis(dpg.mvYAxis, label=f"Chn {i+1}", no_tick_labels=True)
+
                     plot_line = dpg.add_line_series(list(range(self.window_size)), self.plot_array[i], parent=y_axis)
                     self.plot_lines.append(plot_line)
 
@@ -159,7 +160,10 @@ class RealTimeView:
             dpg.set_value(self.plot_lines[plot_idx], [list(range(self.window_size)), self.plot_array[ch_idx]])
             ymin, ymax = np.min(self.plot_array[ch_idx]), np.max(self.plot_array[ch_idx])
             y_axis = dpg.get_item_parent(self.plot_lines[plot_idx])
-            dpg.set_axis_limits(y_axis, ymin - 0.5, ymax + 0.5)
+
+            # Auto-fit Y axis when data updates
+            dpg.fit_axis_data(y_axis)
+            # dpg.set_axis_limits(y_axis, ymin - 0.5, ymax + 0.5)
             
 
     def update_fft_window(self):
@@ -184,7 +188,8 @@ class RealTimeView:
                         # Dynamically set Y-axis limits for better visualization
                         ymin, ymax = np.min(fft_plot_data), np.max(fft_plot_data)
                         y_axis = dpg.get_item_parent(self.fft_lines[plot_idx])
-                        dpg.set_axis_limits(y_axis, ymin=ymin - 10, ymax=ymax + 10)
+                        # dpg.set_axis_limits(y_axis, ymin=ymin - 10, ymax=ymax + 10)
+                        dpg.fit_axis_data(y_axis)
 
             time.sleep(0.05)
 

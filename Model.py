@@ -128,7 +128,7 @@ class EEGModel:
                         arg_max = np.argmax(predict_prob[0])
                         # print(arg_max, predict_prob[0][arg_max])
 
-                        if predict_prob[0][arg_max] > 0.7:
+                        if predict_prob[0][arg_max] > 0.6:
                             if predict[0] == 10:
                                 self.command = '6Hz'
                             elif predict[0] == 8:
@@ -153,7 +153,7 @@ class EEGModel:
             if not self.command_queue.empty():
                 send = self.command_queue.get()
                 sock.sendto(str.encode(send), serverAddressPort)
-            time.sleep(0.2)
+            time.sleep(0.05)
 
 
     def recv_from_unity(self):

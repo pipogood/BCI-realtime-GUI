@@ -16,7 +16,7 @@ ch_names = ['O1','Oz','PO3','POz','Pz']
 num_channels = len(ch_names)
 samp_freq = 512
 window_size_second = 4
-showGUI = False
+showGUI = True
 
 if __name__ == '__main__':
     mp.freeze_support()  # Ensure compatibility with multiprocessing on Windows

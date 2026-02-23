@@ -1,6 +1,5 @@
 from Model import EEGModel
 from View import RealTimeView
-from Controller import RealTimeController
 import multiprocessing as mp
 import time
 import pickle
@@ -11,10 +10,19 @@ import pickle
 #     ch_names = pickle.load(file)
 
 # 2. Select target channels
-ch_names = ['O1','Oz','PO3','POz','Pz']
+# ch_names = ['O1','Oz','PO3','POz','Pz']
+
+ch_names = [
+    "TIMESTAMP",
+    "COUNTER",
+    "INTERPOLATED",
+    "AF3","F7","F3","FC5","T7","P7","O1","O2","P8","T8","FC6","F4","F8","AF4",
+    "MARKER_HARDWARE",
+    "MARKERS"
+]
 
 num_channels = len(ch_names)
-samp_freq = 512
+samp_freq = 128
 window_size_second = 4
 showGUI = True
 
@@ -27,7 +35,7 @@ if __name__ == '__main__':
 
     # Initialize the Model and View with LSL streaming
     model = EEGModel(num_channels=num_channels, samp_freq = samp_freq, window_size_second = window_size_second, band_pass = (2,40),
-                     stream_name="SomSom",status_queue=status_queue, command_queue=command_queue)
+                     stream_name="EmotivDataStream-EEG",status_queue=status_queue, command_queue=command_queue)
     
     view = RealTimeView(model, ch_names, samp_freq=samp_freq, window_size_second=window_size_second)
 

@@ -37,6 +37,8 @@ class EEGModel:
         nyq = 0.5 * samp_freq
         self.b, self.a = signal.butter(4,[band_pass[0]/nyq,band_pass[1]/nyq],'bandpass')
 
+        self.sleep_time = 0.05  # Sleep time for threads
+
     def start_streaming(self):
         """Start the LSL data stream and other processing functions."""
         self.running = True
@@ -66,13 +68,14 @@ class EEGModel:
                         sample, _ = inlet.pull_chunk()
                         if sample:
                             data = np.array(sample).T
+                            # print(data.shape)
                             if data.shape[0] == self.num_channels:
                                 self.EEG_epoch = np.roll(self.EEG_epoch, -data.shape[1], axis=1)
                                 self.EEG_epoch[:, -data.shape[1]:] = data
                                 if not self.queue1.full():
                                     self.queue1.put(self.EEG_epoch)  # Add data if queue1 has space
 
-                        time.sleep(0.05)
+                        time.sleep(self.sleep_time)
 
     def rolling_samples(self):
         """Continuously roll and update the main EEG data buffer."""
@@ -89,7 +92,7 @@ class EEGModel:
                 except Exception as e:
                     print(f"Rolling samples error: {e}")
 
-            time.sleep(0.05)
+            time.sleep(self.sleep_time)
 
     def filtering_windowed_data(self):
         while self.running:
@@ -99,7 +102,7 @@ class EEGModel:
                 if not self.queue3.full():
                     self.queue3.put(filtered_data)
 
-            time.sleep(0.05)
+            time.sleep(self.sleep_time)
 
     def fft_process(self):
         """Compute FFT on filtered data at a limited frequency to manage memory usage."""
@@ -117,6 +120,8 @@ class EEGModel:
 
                     power_spectrum = power_spectrum.reshape(1,power_spectrum.shape[0],power_spectrum.shape[1])
                     fft_test = np.stack([arr.flatten() for arr in power_spectrum])
+
+                    # print(fft_test)
 
                     with open("trained_model/LDA_model.pkl", "rb") as file:
                         svm_model = pickle.load(file)
@@ -143,9 +148,10 @@ class EEGModel:
                         self.command_queue.put(self.command)
 
                     except Exception as e:
-                        print(f"Preprocess model error: {e}")
+                        pass
+                        # print(f"Preprocess model error: {e}")
                         
-            time.sleep(0.05)  # Reduce FFT frequency to conserve memory and processing
+            time.sleep(self.sleep_time)  # Reduce FFT frequency to conserve memory and processing
 
 
     def send_to_unity(self):
@@ -153,7 +159,7 @@ class EEGModel:
             if not self.command_queue.empty():
                 send = self.command_queue.get()
                 sock.sendto(str.encode(send), serverAddressPort)
-            time.sleep(0.05)
+            time.sleep(self.sleep_time)
 
 
     def recv_from_unity(self):

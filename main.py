@@ -27,8 +27,8 @@ ch_names = ['ch1','ch2','ch3','ch4','ch5','ch6','ch7','ch8']  # Example channel 
 
 num_channels = len(ch_names)
 samp_freq = 250
-window_size_second = 5
-showGUI = True
+window_size_second = 4
+showGUI = False
 
 if __name__ == '__main__':
     mp.freeze_support()  # Ensure compatibility with multiprocessing on Windows

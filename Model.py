@@ -150,6 +150,9 @@ class EEGModel:
                     except Exception as e:
                         pass
                         # print(f"Preprocess model error: {e}")
+
+                    self.command_queue.put(self.command)
+
                         
             time.sleep(self.sleep_time)  # Reduce FFT frequency to conserve memory and processing
 
@@ -159,7 +162,7 @@ class EEGModel:
             if not self.command_queue.empty():
                 send = self.command_queue.get()
                 sock.sendto(str.encode(send), serverAddressPort)
-            time.sleep(self.sleep_time)
+            time.sleep(1.0) # Send command every second to avoid flooding
 
 
     def recv_from_unity(self):

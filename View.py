@@ -169,7 +169,7 @@ class RealTimeView:
     def update_fft_window(self):
         """Update the FFT plot window with new FFT data for the selected channels."""
         # Initialize x-axis for frequency bins
-        self.xf = np.linspace(0, 40, 161)  # 0 to 20 Hz, 161 frequency bins
+        self.xf = np.linspace(0, 40, 161)  # 0 to 20 Hz , 161 frequency bins
         while dpg.is_dearpygui_running():
             if not self.queue_fft.empty():
                 # Get the latest FFT data from the queue
